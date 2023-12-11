@@ -1,19 +1,20 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const Validator = require("validator");
 
 // sabry
+//for body encode using classic way
+const bodyParser = require("body-parser");
 
 let app = express();
 
+//middle ware
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 mongoose
   .connect("mongodb://0.0.0.0:27017/")
   .then(() => console.log("connected successfully"))
-  .catch((err) => {
-    console.error(err);
+  .catch((err) => {console.error(err);
   });
 
 const userscheama = new mongoose.Schema({
@@ -38,26 +39,7 @@ const userscheama = new mongoose.Schema({
 
 let usermodel = mongoose.model("user", userscheama);
 
-let user1 = new usermodel({
-  fname: "ahmed",
-  lname: "khaled",
-  email: "ahmed12@gmail",
-  password: "01556452220",
-}).save();
 
-let user2 = new usermodel({
-  fname: "ali",
-  lname: "osama",
-  email: "ali13@gmail",
-  password: "01556452230",
-}).save();
-
-let user3 = new usermodel({
-  fname: "basel",
-  lname: "abdallah",
-  email: "basel14@gmail",
-  password: "01556452240",
-}).save();
 
 const animalscheama = new mongoose.Schema({
   name: String,
@@ -124,13 +106,13 @@ let animal9 = new animalmodel({
 app.get("/users", async (req, res) => {
   let allusers = await usermodel.find();
   res.status(200);
-  res.json(allusers);
+  res.json({allusers});
 });
 
 app.get("/animals", async (req, res) => {
   let allanimals = await animalmodel.find();
   res.status(201);
-  res.json(allanimals);
+  res.json({allanimals});
 });
 
 app.get("/", (req, res) => {
@@ -140,8 +122,6 @@ app.get("/", (req, res) => {
 app.post("/signup", async (req, res) => {
   const { fname, lname, email, password } = req.body;
 
-  // for test
-  console.log(`{fname}, {lname} , {email}, {password}`);
 
   const user = await usermodel.findOne({ email });
 
@@ -168,22 +148,8 @@ app.post("/login", async (req, res) => {
     res.status(400).json({ error: "there no account, please signup" });
   }
 
-  res.status(200).json({ message: "ok" });
+  res.status(200).json({ message: `hello ${fname} ${lname}` });
 });
-
-// const loginscheama = new mongoose.Schema({
-//     email: {
-//         type :String,
-//         require :true,
-//         unique : true
-//     },
-//     password: {
-//         type :String,
-//         require :true
-//     },
-// });
-
-// let loginmodel = mongoose.model("login",loginscheama);
 
 app.listen(3000, function () {
   console.log("i am listening at port 3000 now");
